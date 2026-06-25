@@ -3,8 +3,10 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Serve all frontend files
 app.use(express.static(__dirname));
 
+// API endpoint
 app.get("/api/archive", async (req, res) => {
 
     const site = (req.query.site || "").trim();
@@ -20,9 +22,7 @@ app.get("/api/archive", async (req, res) => {
     const controller = new AbortController();
 
     const timeout = setTimeout(() => {
-
         controller.abort();
-
     }, 10000);
 
     try {
@@ -37,12 +37,10 @@ app.get("/api/archive", async (req, res) => {
         clearTimeout(timeout);
 
         if (!response.ok) {
-
             return res.json({
                 success: false,
                 message: "Website unavailable."
             });
-
         }
 
         const data = await response.json();
@@ -52,49 +50,39 @@ app.get("/api/archive", async (req, res) => {
             data.archived_snapshots.closest;
 
         if (!snapshot || !snapshot.available) {
-
             return res.json({
                 success: false,
                 message: "Website unavailable."
             });
-
         }
 
-        res.json({
-
+        return res.json({
             success: true,
-
             url: snapshot.url,
-
             timestamp: snapshot.timestamp
-
         });
 
-    }
-    catch {
+    } catch (err) {
 
         clearTimeout(timeout);
 
-        res.json({
+        console.error(err);
 
+        return res.json({
             success: false,
-
             message: "Website unavailable."
-
         });
 
     }
 
 });
 
+// Always send index.html for everything else
 app.get("*", (req, res) => {
-
     res.sendFile(__dirname + "/index.html");
-
 });
 
+// Start server
 app.listen(PORT, () => {
-
-    console.log("OldWeb running on port " + PORT);
-
+    console.log(`✅ OldWeb running on port ${PORT}`);
 });
