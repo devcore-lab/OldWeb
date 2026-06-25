@@ -315,307 +315,279 @@
   </main>
 
   <script>
-    const famousSites = [
-      { label: "Google", url: "google.com", wiki: "Google", bestYear: 2000 },
-      { label: "Yahoo", url: "yahoo.com", wiki: "Yahoo!", bestYear: 1998 },
-      { label: "Amazon", url: "amazon.com", wiki: "Amazon_(company)", bestYear: 1999 },
-      { label: "YouTube", url: "youtube.com", wiki: "YouTube", bestYear: 2006 },
-      { label: "Facebook", url: "facebook.com", wiki: "Facebook", bestYear: 2005 },
-      { label: "BBC", url: "bbc.co.uk", wiki: "BBC", bestYear: 2000 },
-      { label: "Apple", url: "apple.com", wiki: "Apple_Inc.", bestYear: 1998 },
-      { label: "Reddit", url: "reddit.com", wiki: "Reddit", bestYear: 2006 },
-      { label: "Wikipedia", url: "wikipedia.org", wiki: "Wikipedia", bestYear: 2002 },
-      { label: "eBay", url: "ebay.com", wiki: "EBay", bestYear: 1999 }
-    ];
+	const famousSites = [
+    { label:"Google",url:"google.com",wiki:"Google",bestYear:2000 },
+    { label:"Yahoo",url:"yahoo.com",wiki:"Yahoo!",bestYear:1998 },
+    { label:"Amazon",url:"amazon.com",wiki:"Amazon_(company)",bestYear:1999 },
+    { label:"YouTube",url:"youtube.com",wiki:"YouTube",bestYear:2006 },
+    { label:"Facebook",url:"facebook.com",wiki:"Facebook",bestYear:2005 },
+    { label:"Apple",url:"apple.com",wiki:"Apple_Inc.",bestYear:1998 },
+    { label:"Wikipedia",url:"wikipedia.org",wiki:"Wikipedia",bestYear:2002 }
+];
 
-    const timelineEvents = [
-      { year: 1991, text: "The first website went online at CERN." },
-      { year: 1994, text: "Yahoo began as a web directory." },
-      { year: 1995, text: "Amazon launched as an online bookstore." },
-      { year: 1998, text: "Google was founded." },
-      { year: 2001, text: "Wikipedia launched." },
-      { year: 2004, text: "Facebook launched." },
-      { year: 2005, text: "YouTube launched." },
-      { year: 2007, text: "The iPhone changed mobile internet." }
-    ];
+const timelineEvents=[
+{year:1991,text:"The first website went online at CERN."},
+{year:1995,text:"Amazon launched."},
+{year:1998,text:"Google was founded."},
+{year:2001,text:"Wikipedia launched."},
+{year:2004,text:"Facebook launched."},
+{year:2005,text:"YouTube launched."}
+];
 
-    const siteInput = document.getElementById("siteInput");
-    const yearSelect = document.getElementById("yearSelect");
-    const travelBtn = document.getElementById("travelBtn");
-    const deepBtn = document.getElementById("deepBtn");
-    const quickSites = document.getElementById("quickSites");
-    const viewerTitle = document.getElementById("viewerTitle");
-    const viewerMeta = document.getElementById("viewerMeta");
-    const statusPill = document.getElementById("statusPill");
-    const frameHolder = document.getElementById("frameHolder");
-    const snapshotInfo = document.getElementById("snapshotInfo");
-    const snapshotLinks = document.getElementById("snapshotLinks");
-    const wikiSummary = document.getElementById("wikiSummary");
-    const errorBox = document.getElementById("errorBox");
-    const noteBox = document.getElementById("noteBox");
-    const timeline = document.getElementById("timeline");
+const siteInput=document.getElementById("siteInput");
+const yearSelect=document.getElementById("yearSelect");
+const travelBtn=document.getElementById("travelBtn");
+const deepBtn=document.getElementById("deepBtn");
 
-    function initYears() {
-      const now = new Date().getFullYear();
-      for (let y = now; y >= 1996; y--) {
-        const opt = document.createElement("option");
-        opt.value = y;
-        opt.textContent = y;
-        if (y === 2000) opt.selected = true;
+const quickSites=document.getElementById("quickSites");
+const viewerTitle=document.getElementById("viewerTitle");
+const viewerMeta=document.getElementById("viewerMeta");
+const statusPill=document.getElementById("statusPill");
+const frameHolder=document.getElementById("frameHolder");
+const snapshotInfo=document.getElementById("snapshotInfo");
+const snapshotLinks=document.getElementById("snapshotLinks");
+const wikiSummary=document.getElementById("wikiSummary");
+const errorBox=document.getElementById("errorBox");
+const noteBox=document.getElementById("noteBox");
+const timeline=document.getElementById("timeline");
+
+function initYears(){
+
+    const now=new Date().getFullYear();
+
+    for(let y=now;y>=1996;y--){
+
+        const opt=document.createElement("option");
+        opt.value=y;
+        opt.textContent=y;
+
+        if(y===2000) opt.selected=true;
+
         yearSelect.appendChild(opt);
-      }
+
     }
 
-    function initQuickSites() {
-      famousSites.forEach(site => {
-        const chip = document.createElement("div");
-        chip.className = "chip";
-        chip.textContent = `${site.label} ${site.bestYear}`;
-        chip.onclick = () => {
-          siteInput.value = site.url;
-          yearSelect.value = site.bestYear;
-          loadWikipedia(site.wiki);
-          fastTravel();
-        };
-        quickSites.appendChild(chip);
-      });
-    }
+}
 
-    function initTimeline() {
-      timeline.innerHTML = timelineEvents.map(e => `
+function initTimeline(){
+
+    timeline.innerHTML=timelineEvents.map(e=>`
         <div class="event">
-          <div class="year">${e.year}</div>
-          <div>${e.text}</div>
+            <div class="year">${e.year}</div>
+            <div>${e.text}</div>
         </div>
-      `).join("");
-    }
+    `).join("");
 
-    function cleanUrl(input) {
-      let url = input.trim().toLowerCase();
-      url = url.replace(/^https?:\/\//i, "");
-      url = url.replace(/^www\./i, "");
-      url = url.split(/[/?#]/)[0];
-      return url;
-    }
+}
 
-    function timestampForYear(year) {
-      return `${year}0101120000`;
-    }
+function initQuickSites(){
 
-    function formatTimestamp(ts) {
-      if (!ts || ts.length < 8) return "Unknown date";
-      return `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)} ${ts.slice(8, 10) || "00"}:${ts.slice(10, 12) || "00"}`;
-    }
+    famousSites.forEach(site=>{
 
-    function setStatus(text, good=false, bad=false) {
-      statusPill.textContent = text;
-      statusPill.className = "status";
-      if (good) statusPill.classList.add("good");
-      if (bad) statusPill.classList.add("bad");
-    }
+        const chip=document.createElement("div");
 
-    function clearError() {
-      errorBox.style.display = "none";
-      errorBox.textContent = "";
-    }
+        chip.className="chip";
 
-    function showError(msg) {
-      errorBox.style.display = "block";
-      errorBox.textContent = msg;
-    }
+        chip.textContent=`${site.label} ${site.bestYear}`;
 
-    function setLinks(clean, archiveUrl) {
-      snapshotLinks.innerHTML = `
-        ${archiveUrl ? `<a class="btn" href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Open archive</a>` : ""}
-        <a class="btn" href="https://web.archive.org/web/*/${clean}" target="_blank" rel="noopener noreferrer">All snapshots</a>
-        <a class="btn" href="https://${clean}" target="_blank" rel="noopener noreferrer">Current site</a>
-      `;
-    }
+        chip.onclick=()=>{
 
-    async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        return await res.json();
-      } finally {
-        clearTimeout(timer);
-      }
-    }
+            siteInput.value=site.url;
 
-    async function fastLookup(clean, year) {
-      const api = `https://archive.org/wayback/available?url=${encodeURIComponent(clean)}&timestamp=${timestampForYear(year)}`;
-      const data = await fetchJsonWithTimeout(api, 4500);
-      const snap = data?.archived_snapshots?.closest;
-      return snap?.available ? { ...snap, source: "Archive" } : null;
-    }
+            yearSelect.value=site.bestYear;
 
-    async function deepLookup(clean, year) {
-      const from = `${year}0101`;
-      const to = `${year}1231`;
-      const api =
-        `https://web.archive.org/cdx?url=${encodeURIComponent(clean)}` +
-        `&from=${from}&to=${to}&output=json&fl=timestamp,original,statuscode,mimetype,digest` +
-        `&filter=statuscode:200&collapse=digest&limit=20`;
+            loadWikipedia(site.wiki);
 
-      const data = await fetchJsonWithTimeout(api, 8000);
-      if (!Array.isArray(data) || data.length < 2) return null;
+            travel();
 
-      const rows = data.slice(1).filter(r => String(r[3] || "").includes("text/html"));
-      if (!rows.length) return null;
+        };
 
-      const target = Number(`${year}0701120000`);
-      let best = rows[0];
-      let bestDiff = Math.abs(Number(best[0]) - target);
+        quickSites.appendChild(chip);
 
-      for (const row of rows) {
-        const diff = Math.abs(Number(row[0]) - target);
-        if (diff < bestDiff) {
-          best = row;
-          bestDiff = diff;
-        }
-      }
-
-      return {
-        available: true,
-        timestamp: best[0],
-        status: best[2] || "200",
-        url: `https://web.archive.org/web/${best[0]}/${best[1] || clean}`,
-        source: "Archive"
-      };
-    }
-
-    function renderSnapshot(clean, year, snap) {
-      const date = formatTimestamp(snap.timestamp);
-      viewerTitle.textContent = `${clean} in ${year}`;
-      viewerMeta.textContent = `Snapshot: ${date}`;
-      snapshotInfo.innerHTML = `
-        <b>Website:</b> ${clean}<br>
-        <b>Requested year:</b> ${year}<br>
-        <b>Archive date:</b> ${date}<br>
-        <b>Source:</b> ${snap.source}<br>
-        <b>Status:</b> ${snap.status || "Unknown"}<br>
-      `;
-      setLinks(clean, snap.url);
-      noteBox.textContent = "Tip: if the preview loads slowly, click “Open archive”. The preview is the slow part, not the search.";
-      frameHolder.className = "";
-      frameHolder.innerHTML = `<iframe title="Archived website" src="${snap.url}" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
-      setStatus("Loaded", true);
-    }
-
-    async function loadWikipedia(title) {
-      try {
-        wikiSummary.textContent = "Loading Wikipedia summary...";
-        const api = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-        const res = await fetch(api);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        wikiSummary.innerHTML = `<b>${data.title || title}</b><br>${data.extract || "No summary available."}`;
-      } catch {
-        wikiSummary.textContent = "No Wikipedia summary available.";
-      }
-    }
-
-    function prepareSearch() {
-      const clean = cleanUrl(siteInput.value);
-      const year = yearSelect.value;
-
-      clearError();
-
-      if (!clean || !clean.includes(".") || clean.includes(" ")) {
-        showError("Enter a valid website like google.com or bbc.co.uk.");
-        return null;
-      }
-
-      viewerTitle.textContent = `${clean} in ${year}`;
-      viewerMeta.textContent = "Searching the archives...";
-      snapshotInfo.textContent = "Searching the archives...";
-      setLinks(clean, "");
-      return { clean, year };
-    }
-
-    async function fastTravel() {
-      const args = prepareSearch();
-      if (!args) return;
-
-      const { clean, year } = args;
-      travelBtn.disabled = true;
-      deepBtn.disabled = true;
-      setStatus("Searching...");
-
-      try {
-        const snap = await fastLookup(clean, year);
-        if (!snap) {
-          setStatus("Try another year", false, true);
-          frameHolder.className = "empty";
-          frameHolder.innerHTML = `
-            <div>
-              <div style="font-size:3rem;">🔎</div>
-              <p>No quick result found for <b>${clean}</b> in <b>${year}</b>.</p>
-              <p>Press <b>Browse Archive</b> for a slower but stronger search.</p>
-            </div>
-          `;
-          snapshotInfo.textContent = "No archived page was found for this year.";
-          noteBox.textContent = "Fast mode is intentionally quicker. It may miss some older captures.";
-          return;
-        }
-
-        renderSnapshot(clean, year, snap);
-      } catch {
-        setStatus("Timed out", false, true);
-        showError("The archive couldn't be reached. Please try again.");
-        noteBox.textContent = "The Internet Archive can be slow sometimes. The All snapshots link is often the fastest fallback.";
-      } finally {
-        travelBtn.disabled = false;
-        deepBtn.disabled = false;
-      }
-    }
-
-    async function runDeepSearch() {
-      const args = prepareSearch();
-      if (!args) return;
-
-      const { clean, year } = args;
-      travelBtn.disabled = true;
-      deepBtn.disabled = true;
-      setStatus("Searching...");
-
-      try {
-        const snap = await deepLookup(clean, year);
-        if (!snap) {
-          setStatus("Not found", false, true);
-          frameHolder.className = "empty";
-          frameHolder.innerHTML = `
-            <div>
-              <div style="font-size:3rem;">🪦</div>
-              <p>No snapshot found for <b>${clean}</b> in <b>${year}</b>.</p>
-              <p>Try a nearby year or use All snapshots.</p>
-            </div>
-          `;
-          snapshotInfo.textContent = "No archived page was found for this year.";
-          return;
-        }
-
-        renderSnapshot(clean, year, snap);
-      } catch {
-        setStatus("Timed out", false, true);
-        showError("The archive couldn't be reached. Please try again.");
-      } finally {
-        travelBtn.disabled = false;
-        deepBtn.disabled = false;
-      }
-    }
-
-    travelBtn.addEventListener("click", fastTravel);
-    deepBtn.addEventListener("click", runDeepSearch);
-    siteInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") fastTravel();
     });
 
-    initYears();
-    initQuickSites();
-    initTimeline();
+}
+
+function cleanUrl(url){
+
+    return url
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//,"")
+        .replace(/^www\./,"")
+        .split(/[/?#]/)[0];
+
+}
+
+function setStatus(text,good=false,bad=false){
+
+    statusPill.textContent=text;
+
+    statusPill.className="status";
+
+    if(good) statusPill.classList.add("good");
+
+    if(bad) statusPill.classList.add("bad");
+
+}
+
+function clearError(){
+
+    errorBox.style.display="none";
+
+    errorBox.textContent="";
+
+}
+
+function showError(msg){
+
+    errorBox.style.display="block";
+
+    errorBox.textContent=msg;
+
+}
+
+async function loadWikipedia(title){
+
+    try{
+
+        wikiSummary.textContent="Loading...";
+
+        const res=await fetch(
+            "https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title)
+        );
+
+        const data=await res.json();
+
+        wikiSummary.innerHTML=
+            "<b>"+data.title+"</b><br>"+data.extract;
+
+    }catch{
+
+        wikiSummary.textContent="No summary available.";
+
+    }
+
+}
+
+async function travel(){
+
+    clearError();
+
+    const site=cleanUrl(siteInput.value);
+
+    const year=yearSelect.value;
+
+    viewerTitle.textContent=site+" in "+year;
+
+    viewerMeta.textContent="Searching...";
+
+    snapshotInfo.textContent="Searching archive...";
+
+    frameHolder.className="empty";
+
+    frameHolder.innerHTML="<h2>Searching...</h2>";
+
+    snapshotLinks.innerHTML="";
+
+    setStatus("Searching...");
+
+    travelBtn.disabled=true;
+
+    deepBtn.disabled=true;
+
+    try{
+
+        const response=await fetch(
+
+            `/api/archive?site=${encodeURIComponent(site)}&year=${year}`
+
+        );
+
+        const data=await response.json();
+
+        if(!data.success){
+
+            frameHolder.innerHTML=`
+                <div>
+                    <div style="font-size:3rem;">🪦</div>
+                    <h2>Website unavailable</h2>
+                    <p>${data.message}</p>
+                </div>
+            `;
+
+            snapshotInfo.textContent=data.message;
+
+            setStatus("Unavailable",false,true);
+
+            return;
+
+        }
+
+        const ts=data.timestamp;
+
+        const date=
+            ts.substring(0,4)+"-"+
+            ts.substring(4,6)+"-"+
+            ts.substring(6,8);
+
+        viewerMeta.textContent=date;
+
+        snapshotInfo.innerHTML=`
+            <b>Website:</b> ${site}<br>
+            <b>Year:</b> ${year}<br>
+            <b>Snapshot:</b> ${date}<br>
+        `;
+
+        snapshotLinks.innerHTML=`
+            <a class="btn"
+               href="${data.url}"
+               target="_blank">
+               Open Archive
+            </a>
+        `;
+
+        noteBox.textContent=
+            "Archive found by the OldWeb server.";
+
+        frameHolder.className="";
+
+        frameHolder.innerHTML=`
+            <iframe
+                src="${data.url}"
+                loading="lazy">
+            </iframe>
+        `;
+
+        setStatus("Loaded",true);
+
+    }
+    catch(e){
+
+        showError("Cannot connect to server.");
+
+        setStatus("Offline",false,true);
+
+        frameHolder.innerHTML="<h2>Server unavailable</h2>";
+
+    }
+
+    travelBtn.disabled=false;
+
+    deepBtn.disabled=false;
+
+}
+
+travelBtn.onclick=travel;
+deepBtn.onclick=travel;
+
+siteInput.addEventListener("keydown",e=>{
+    if(e.key==="Enter") travel();
+});
+
+initYears();
+initTimeline();
+initQuickSites();
   </script>
 </body>
 </html>
